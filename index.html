@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+        <style>
+            body{
+                ::selection{
+                        background-color: #fff;
+                        color: grey
+                }
+            }
+        </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    
+   
+</head>
+<body>
+    <div class="bg-zinc-900  text-white w-full  ">
+        <div class="w-full h-screen flex flex-col justify-center item-center">
+            <h1 class="uppercase text-wrap text-[10vw] font-black text-center ">Scrolling Animation</h1>
+            <p class="text-center py-8 text-xl">For the best viewing experience, please access this content on a desktop or laptop. </p>
+        </div>
+        <div class="parent w-full h-[2000vh] bg-zinc-800 relative left-0 top-0">
+
+            <div class=" w-full h-screen sticky left-0 top-0 ">
+                <canvas id="frame"  class="w-[100%] h-screen" ></canvas>
+            </div>
+        </div>
+        <div class="w-full h-screen flex justify-center item-center">
+            <h1 class="uppercase text-wrap text-[10vw] font-black text-center my-48">Thanks</h1>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/locomotive-scroll@beta/bundled/locomotive-scroll.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha512-onMTRKJBKz8M1TnqqDuGBlowlH0ohFzMXYRNebz+yOcc5TQr/zAKsthzhuv0hiyUKEiQEQXEynnXCvNTOk50dg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+        <script>
+
+(function () {
+        const locomotiveScroll = new LocomotiveScroll();
+    })();
+            let canvas = document.querySelector("canvas")
+
+            const context =canvas.getContext("2d")
+
+                const frames = {
+                    currentIndex: 1,
+                    maxIndex: 1432,
+                };
+
+                const images = []
+                  let imageloaded = 0;
+             function preloadImages(){
+                for (let i = 1; i <= frames.maxIndex; i++){
+                    const imageUrl = `./frames/frame_${i.toString().padStart(4, "0")}.png`
+
+                    const img = new Image()
+                    img.src = imageUrl
+                    
+
+                    img.onload = () => {
+                        imageloaded++;
+
+                        if (imageloaded === frames.maxIndex) {
+            
+                            
+                            loadImage(frames.currentIndex)
+                            startAnimation()
+                    }
+                }
+
+                images.push(img)
+            }}
+
+
+            function loadImage(index){
+                if(index >=0 && index <= frames.maxIndex){
+                    const img = images[index]
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+
+            const scaleX = canvas.width/img.width
+            const scaleY = canvas.height/img.height
+            const scale = Math.max(scaleX , scaleY)
+            
+            const newWidth = img.width * scale;
+            const newHeigh = img.height * scale;
+            
+            const offsetX = (canvas.width - newWidth)/2
+            const offsetY = (canvas.height - newHeigh)/2
+            
+
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.imageSmoothingEnabled= true
+            context.imageSmoothingQuality="high";
+            context.drawImage(img, offsetX, offsetY, newWidth, newHeigh);
+            frames.currentIndex = index
+        
+                }
+            }
+
+            function startAnimation(){
+                let tl = gsap.timeline({
+                    scrollTrigger:{
+                    trigger: ".parent",   
+                    start:"top top",
+                    scrub:3,
+                    markers:false
+                }
+                })
+
+                    tl.to(frames,{
+     currentIndex : frames.maxIndex,
+     onUpdate: function(){
+     loadImage(Math.floor(frames.currentIndex))
+     }
+     })
+
+            }
+
+        preloadImages()
+        </script>
+    
+</body>
+</html>
